@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>放大镜</title>
+	<style>
+		#container{
+			width:300px;
+			height:300px;
+			position: relative;
+		}
+		.blur{
+			-webkit-filter: blur(3px); /* Chrome, Opera */
+	    	-moz-filter: blur(3px);
+	        -ms-filter: blur(3px);    
+	        filter: blur(3px);
+		}
+	</style>
+	<script src="js/jquery-1.12.4.js"></script>
+	<script>
+		$(function(){
+			var scale = 4;
+			var layWH = 300 / scale;
+			$("<div id='lay'><img src='img/1.jpg' style='width:300px;height:300px;' /></div>").css({
+				width:layWH,
+				height:layWH,
+				position:"absolute",
+				display:"none",
+				overflow:"hidden",
+				zIndex:100,
+				boxShadow:"0px 0px 20px #333"
+			}).appendTo("#container");
+
+			$("<div id='zoom'><img src='img/1.jpg' /></div>").css({
+				width:300,
+				height:300,
+				position:"absolute",
+				left:0,
+				top:0,
+				overflow:"hidden",
+				filter:"alpha(opacity=0)",
+				opacity:"0"
+			}).appendTo("#container").hide();
+
+			var $img = $("<img src='img/1.jpg' />");
+			$img.appendTo("#container").css({
+				width:300,
+				height:300
+			});
+			$("#container").hover(function(){
+				$("#container > img").toggleClass("blur");
+				$("#lay").show();
+				$("#zoom").css({
+					width:0,
+					height:0,
+					top:150,
+					left:150
+				}).show().stop().animate({left:310,top:0,width:300,height:300,opacity:1},400);
+				$("#zoom > img").css({
+					width:300 * scale,
+					height:300 * scale
+				});
+				$(this).mousemove(function(e){
+					$("#lay").css({
+						left:Math.max(Math.min(e.pageX - $("#container").offset().left - $("#lay").width() / 2,300 - $("#lay").width()),0),
+						top:Math.max(Math.min(e.pageY - $("#container").offset().top - $("#lay").height() / 2,300 - $("#lay").height()),0)
+					});
+					$("#zoom > img").css({
+						marginLeft:$("#lay").position().left * scale * -1,
+						marginTop:$("#lay").position().top * scale * -1
+					});
+					$("#lay > img").css({
+						marginLeft:$("#lay").position().left * -1,
+						marginTop:$("#lay").position().top * -1
+					});
+				});
+			},function(){
+				$("#container > img").toggleClass("blur");
+				$("#lay").hide();
+				$("#zoom").stop().animate({left:150,top:150,width:0,height:0,opacity:0},400);
+			});
+		});
+	</script>
+</head>
+<body>
+	<div id="container">
+		
+	</div>
+</body>
+</html>
